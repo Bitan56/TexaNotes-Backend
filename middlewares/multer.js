@@ -10,7 +10,7 @@ if (!fs.existsSync(dir)){
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "./public")
+        cb(null, "/tmp")
     },
     filename: (req, file, cb) => {
         // 1. Replace all spaces with underscores
