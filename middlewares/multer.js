@@ -1,16 +1,11 @@
 import multer from 'multer'
-import fs from 'fs'
 
-// Optional but highly recommended: 
-// Automatically create the 'public' folder if it accidentally gets deleted
-const dir = './public';
-if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir, { recursive: true });
-}
+// No fs import, no mkdirSync!
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "/tmp")
+        // Correctly using Vercel's writable temp folder
+        cb(null, "/tmp") 
     },
     filename: (req, file, cb) => {
         // 1. Replace all spaces with underscores
