@@ -1,12 +1,10 @@
 import User from "../models/user.model.js"
 import bcrypt from "bcryptjs";
 
-// Add req and res here!
 export const allUsers = async (req, res) => {
     try {
         const users = await User.find().sort({ createdAt: -1 });
 
-        // Now 'res' is defined and can send the response
         return res.status(200).json({
             success: true,
             count: users.length,
@@ -15,35 +13,34 @@ export const allUsers = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: "Server Error: Could not fetch users", // Changed "notes" to "users"
+            message: "Server Error: Could not fetch users",
             error: error.message
         });
     }
-}
+};
 
 export const updateProfile = async (req, res) => {
     try {
-        // Assuming your route looks like: PUT /api/users/update/:username
-        const currentUserName = req.params.username; 
+        const currentUserName = req.params.username;
         const { name, email, userName, password } = req.body;
 
         // Find the user in the database
-        const user = await User.findOne({ 
-            $or: [{ userName: currentUserName }, { username: currentUserName }] 
+        const user = await User.findOne({
+            $or: [{ userName: currentUserName }, { username: currentUserName }]
         });
 
         if (!user) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "User not found" 
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
             });
         }
 
         // Update fields if they were provided in the request
         if (name) user.name = name;
         if (email) user.email = email;
-        if (userName) user.userName = userName; // The new username
-        
+        if (userName) user.userName = userName; 
+
         // If the user wants to change their password, hash it before saving
         if (password) {
             const salt = await bcrypt.genSalt(10);
@@ -66,11 +63,11 @@ export const updateProfile = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: "Server Error: Could not update profile",
+            message: `Server Error: ${error.message}`,
             error: error.message
         });
     }
-};
+}; // <--- THIS WAS THE MISSING BRACE!
 
 export const toggleBlockUser = async (req, res) => {
     try {
@@ -79,25 +76,25 @@ export const toggleBlockUser = async (req, res) => {
 
         // 1. Validate the input
         if (typeof isBlocked !== 'boolean') {
-            return res.status(400).json({ 
-                success: false, 
-                message: "isBlocked must be a boolean (true or false)" 
+            return res.status(400).json({
+                success: false,
+                message: "isBlocked must be a boolean (true or false)"
             });
         }
 
         // 2. Find the user in the database
-        const user = await User.findOne({ 
-            $or: [{ userName: targetUserName }, { username: targetUserName }] 
+        const user = await User.findOne({
+            $or: [{ userName: targetUserName }, { username: targetUserName }]
         });
 
         if (!user) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "User not found" 
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
             });
         }
 
-        // 3. Security Check: Prevent admins from blocking other admins (Optional but recommended)
+        // 3. Security Check: Prevent admins from blocking other admins
         if (user.isAdmin && isBlocked === true) {
             return res.status(403).json({
                 success: false,
@@ -135,16 +132,15 @@ export const updateUserStatus = async (req, res) => {
 
         // Find the user
         const user = await User.findById(id);
-        
+
         if (!user) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "User not found" 
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
             });
         }
 
         // Update fields if they are provided in the request
-        // (Checking for undefined allows us to explicitly set them to false)
         if (isAdmin !== undefined) user.isAdmin = isAdmin;
         if (isBlocked !== undefined) user.isBlocked = isBlocked;
 
