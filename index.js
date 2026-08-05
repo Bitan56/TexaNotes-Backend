@@ -13,7 +13,7 @@ const app = express()
 const port = process.env.PORT || 5000
 
 app.use(cors({
-    origin: '*', // This allows requests from ANY website (including your 127.0.0.1)
+    origin: true, // This allows requests from ANY website (including your 127.0.0.1)
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true 
 }));
