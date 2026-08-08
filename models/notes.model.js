@@ -37,6 +37,11 @@ const noteSchema = new mongoose.Schema({
     },
     teacher:{
         type: String
+    },
+    price:{
+        type: Number,
+        required: true,
+        default: 5
     }
 }, {
     timestamps: true

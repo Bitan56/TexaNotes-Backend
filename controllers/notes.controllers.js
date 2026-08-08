@@ -2,6 +2,7 @@ import uploadOnCloudinary from "../config/cloudinary.js";
 import Notes from "../models/notes.model.js"
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import User from "../models/user.model.js";
 
 export const UploadNotes = async (req, res) => {
     try {
@@ -216,5 +217,54 @@ export const updateNote = async (req, res) => {
             message: "Server Error: Could not update the note",
             error: error.message
         });
+    }
+};
+
+// Function to handle a user purchasing a note
+export const purchaseNote = async (req, res) => {
+    try {
+        const { userName, noteId } = req.body;
+
+        // Validation
+        if (!userName || !noteId) {
+            return res.status(400).json({ message: "Missing userName or noteId." });
+        }
+
+        // Fetch User and Note from DB
+        const user = await User.findOne({ userName });
+        const note = await Notes.findById(noteId);
+
+        if (!user) return res.status(404).json({ message: "User not found." });
+        if (!note) return res.status(404).json({ message: "Note not found." });
+
+        // Check if user already owns this note
+        if (user.notes.includes(noteId)) {
+            return res.status(200).json({ 
+                message: "You already own this note.", 
+                credits: user.credits 
+            });
+        }
+
+        // Check if user has enough credits
+        if (user.credits < note.price) {
+            return res.status(400).json({ 
+                message: "Insufficient credits to unlock this note." 
+            });
+        }
+
+        // Deduct credits and add note to user's array
+        user.credits -= note.price;
+        user.notes.push(noteId);
+        
+        await user.save();
+
+        res.status(200).json({ 
+            message: "Note unlocked successfully!", 
+            credits: user.credits 
+        });
+        
+    } catch (error) {
+        console.error("Error purchasing note:", error);
+        res.status(500).json({ message: "Internal server error." });
     }
 };

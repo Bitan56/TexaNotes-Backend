@@ -35,7 +35,18 @@ const userSchema = new mongoose.Schema({
     isOtpVerified: {
         type: Boolean,
         default: false
-    }
+    },
+    credits:{
+        type: Number,
+        required: true,
+        default: 100
+    },
+    notes: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Notes"
+        }
+    ],
 }, {
     timestamps: true
 })

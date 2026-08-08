@@ -6,6 +6,7 @@ import connectDB from './config/db.js'
 import authRouter from './routes/auth.routes.js'
 import noteRouter from './routes/notes.route.js'
 import userRouter from './routes/user.route.js'
+import creditRouter from './routes/credit.routes.js'
 
 dotenv.config()
 
@@ -23,6 +24,7 @@ app.use(cookieParser())
 app.use("/api/auth", authRouter)
 app.use('/api/notes', noteRouter)
 app.use('/api/users',userRouter)
+app.use('/api/credits',creditRouter)
 
 app.get("/", (req, res) => {
     res.send("hello")
