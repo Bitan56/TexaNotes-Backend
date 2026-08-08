@@ -92,10 +92,15 @@ export const deleteNote = async (req, res) => {
         }
 
         // 2. Delete the file from Cloudinary
-        // NOTE: Your Note model MUST store the Cloudinary public ID when it gets created. 
-        // Example: note.cloudinaryId = result.public_id (from the upload response)
-        if (note.cloudinaryId) {
-            await cloudinary.uploader.destroy(note.filePublicId, { resource_type: "raw" }); // use "raw" for pdfs/docs, or "image" for images
+        if (note.filePublicId) {
+            // Check if the URL indicates it's a raw file (like a .docx or raw .pdf)
+            // Adjust this logic if you explicitly set resource_type: "raw" during upload
+            const isRaw = note.noteUrl.includes('/raw/upload/'); 
+            const resourceType = isRaw ? "raw" : "image"; 
+
+            await cloudinary.uploader.destroy(note.filePublicId, { 
+                resource_type: resourceType 
+            });
         }
 
         // 3. Delete the note from MongoDB
