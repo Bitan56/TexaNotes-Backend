@@ -166,3 +166,31 @@ export const updateUserStatus = async (req, res) => {
         });
     }
 };
+
+// Function to delete a user completely from the database
+export const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // 1. Check if the user exists and delete them
+        const deletedUser = await User.findByIdAndDelete(id);
+
+        if (!deletedUser) {
+            return res.status(404).json({ message: "User not found or already deleted." });
+        }
+
+        // Optional: If you want to delete their notes, payment requests, etc. 
+        // you can do it here. Example:
+        // await PaymentRequest.deleteMany({ userName: deletedUser.userName });
+        // await Notes.deleteMany({ uploadedBy: deletedUser.userName });
+
+        res.status(200).json({ 
+            success: true, 
+            message: "User deleted successfully." 
+        });
+
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({ message: "Internal server error." });
+    }
+};
